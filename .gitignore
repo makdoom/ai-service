@@ -1,13 +1,63 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
+# Dependencies
+**/node_modules/
+node_modules/
+.pnpm-debug.log*
+.npm/
+
+# Build outputs
+**/dist/
+**/build/
 dist/
-wheels/
-*.egg-info
+build/
+*.pyc
+**/__pycache__/
+__pycache__/
 
-# Virtual environments
-.venv
-
+# Environment & Secrets
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/*.env
 .env
-chroma_db/
+*.env
+
+# Python specific
+**/.venv/
+**/venv/
+**/ENV/
+**/env/
+.venv/
+venv/
+.python-version
+.pytest_cache/
+.coverage
+.tox/
+.nox/
+.cache/
+.mypy_cache/
+.ruff_cache/
+.uv/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local database/cache for RAG
+data/
+*.db
+*.sqlite
+outputs/
+temp/
