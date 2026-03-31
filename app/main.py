@@ -27,7 +27,7 @@ def create_app() -> FastAPI:
     # Set up CORS defaults
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"], # Should be locked down in production to specific origins
+        allow_origins=settings.CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

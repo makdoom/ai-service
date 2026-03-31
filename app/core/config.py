@@ -10,6 +10,13 @@ class Settings(BaseSettings):
     AUTH_TOKEN: str
     CHROMA_DB_PATH: str = "./chroma_db"
     
+    # Gemini Models
+    GEMINI_MODEL: str = "gemini-2.5-flash" 
+    EMBEDDING_MODEL: str = "gemini-embedding-001"
+    
+    # Security
+    CORS_ORIGINS: list[str] = ["*"]
+    
     # You can add DB URIs, secret keys, etc. below:
     # DATABASE_URI: str = "postgresql://user:pass@localhost:5432/db"
     # OPENAI_API_KEY: str | None = None

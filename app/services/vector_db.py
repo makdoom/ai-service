@@ -1,20 +1,20 @@
 import logging
 import uuid
 import chromadb
-from google import genai
 from app.core.config import settings
+from app.core.clients import get_genai_client, get_chroma_client
 
 logger = logging.getLogger(__name__)
 
 class GeminiEmbeddingFunction(chromadb.EmbeddingFunction):
   def __init__(self):
-    self.client = genai.Client(api_key=settings.GOOGLE_GEMINI_API_KEY)
+    self.client = get_genai_client()
 
   def __call__(self, input: chromadb.Documents):
     for attempt in range(3):
       try:
         response = self.client.models.embed_content(
-          model="gemini-embedding-001",
+          model=settings.EMBEDDING_MODEL,
           contents=input,
           config={"task_type":"RETRIEVAL_DOCUMENT"}
         )
@@ -28,7 +28,7 @@ class GeminiEmbeddingFunction(chromadb.EmbeddingFunction):
 def store_in_chroma(chunks: list, video_id: str):
     logger.info(f"🧠 Generating Gemini embeddings for video {video_id}...")
     try:
-        client = chromadb.PersistentClient(path=settings.CHROMA_DB_PATH)
+        client = get_chroma_client()
         gemini_embedding_func = GeminiEmbeddingFunction()
         
         # collection per video_id

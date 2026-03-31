@@ -1,23 +1,26 @@
 import logging
-import time
-import chromadb
-from google import genai
+import asyncio
 from app.core.config import settings
 from app.services.vector_db import GeminiEmbeddingFunction
+from app.core.clients import get_genai_client, get_chroma_client
 
 logger = logging.getLogger(__name__)
 
-def query_rag(query: str, video_id: str):
+async def query_rag(query: str, video_id: str):
   logger.info(f"\n🔍 Searching for: '{query}' in video {video_id}...")
   try:
-    chroma_client = chromadb.PersistentClient(path=settings.CHROMA_DB_PATH)
+    chroma_client = get_chroma_client()
     gemini_embedding_func = GeminiEmbeddingFunction()
-    collection = chroma_client.get_collection(name=video_id, embedding_function=gemini_embedding_func)
+    
+    # collection.get_collection is sync, wrapping in thread if needed (though it's fast)
+    collection = await asyncio.to_thread(chroma_client.get_collection, name=video_id, embedding_function=gemini_embedding_func)
   except Exception as error:
     logger.error(f"❌ Collection not found for {video_id}. Details: {error}")
     return None, []
 
-  results = collection.query(query_texts=[query], n_results=5)
+  # collection.query is sync (I/O intensive), wrap in thread
+  results = await asyncio.to_thread(collection.query, query_texts=[query], n_results=5)
+  
   if not results["documents"] or not results["documents"][0]:
     logger.warning("❌ No relevant context found.")
     return None, []
@@ -45,12 +48,13 @@ def query_rag(query: str, video_id: str):
     "Be concise."
   )
 
-  genai_client = genai.Client(api_key=settings.GOOGLE_GEMINI_API_KEY)
+  genai_client = get_genai_client()
 
   for attempt in range(3):
     try:
-      response = genai_client.models.generate_content(
-        model="gemini-2.5-flash",
+      # Use Async client (aio)
+      response = await genai_client.aio.models.generate_content(
+        model=settings.GEMINI_MODEL,
         contents=f"{context_text}\n\nQuestion: {query}",
         config={"system_instruction": system_prompt}
       )
@@ -59,4 +63,4 @@ def query_rag(query: str, video_id: str):
       if attempt == 2:
           logger.error(f"❌ Error generating response: {e}")
           raise e
-      time.sleep(2 ** attempt)
+      await asyncio.sleep(2 ** attempt)
