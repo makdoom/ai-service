@@ -3,7 +3,7 @@ import { redisClient } from '@/utils/redis';
 
 export const VIDEO_QUEUE_NAME = 'video-processing';
 
-const queueOptions = {
+export const videoQueueOptions = {
   connection: redisClient,
 };
 
@@ -12,7 +12,7 @@ class QueueService {
   private videoQueue: Queue;
 
   constructor() {
-    this.videoQueue = new Queue(VIDEO_QUEUE_NAME, queueOptions);
+    this.videoQueue = new Queue(VIDEO_QUEUE_NAME, videoQueueOptions);
     console.log(`BullMQ Queue "${VIDEO_QUEUE_NAME}" initialized`);
   }
 
