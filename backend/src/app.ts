@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { videoRoutes } from "@/routes/video.routes";
+import { queryRoutes } from "./routes/query.routes";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Routes
 app.use("/api/v1/video", videoRoutes);
+app.use("/api/v1/query", queryRoutes);
 
 // Basic health check
 app.get("/health", (req, res) => {

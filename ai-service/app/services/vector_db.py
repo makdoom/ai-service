@@ -25,7 +25,7 @@ class GeminiEmbeddingFunction(chromadb.EmbeddingFunction):
             raise e
         time.sleep(2 ** attempt)
 
-def store_in_chroma(chunks: list, video_id: str):
+def store_in_chroma(chunks_data: dict, video_id: str):
     logger.info(f"🧠 Generating Gemini embeddings for video {video_id}...")
     try:
         client = get_chroma_client()
@@ -35,11 +35,31 @@ def store_in_chroma(chunks: list, video_id: str):
         collection = client.get_or_create_collection(name=video_id, embedding_function=gemini_embedding_func)
 
         documents, metadatas, ids = [], [], []
-        for i, chunk in enumerate(chunks):
+        
+        # Index Micro Chunks (Precision layer)
+        for i, chunk in enumerate(chunks_data.get("micro", [])):
             if not chunk["text"]: continue
             documents.append(chunk["text"])
-            metadatas.append({"start": chunk["start"], "end": chunk["end"], "chunk_index": i})
-            ids.append(str(uuid.uuid4()))
+            metadatas.append({
+                "start": chunk["start"], 
+                "end": chunk["end"], 
+                "chunk_index": i,
+                "type": "micro",
+                "macro_parent": chunk.get("macro_parent", "")
+            })
+            ids.append(f"{video_id}_micro_{i}")
+
+        # Index Macro Chunks (Boundary/Themes layer)
+        for i, chunk in enumerate(chunks_data.get("macro", [])):
+            if not chunk["text"]: continue
+            documents.append(chunk["text"])
+            metadatas.append({
+                "start": chunk["start"], 
+                "end": chunk["end"], 
+                "chunk_index": i,
+                "type": "macro"
+            })
+            ids.append(f"{video_id}_macro_{i}")
 
         if not documents:
             logger.warning("⚠️ No valid documents to store.")
@@ -47,12 +67,12 @@ def store_in_chroma(chunks: list, video_id: str):
 
         BATCH_SIZE = 50
         for i in range(0, len(documents), BATCH_SIZE):
-            collection.add(
+            collection.upsert(
                 documents=documents[i:i+BATCH_SIZE],
                 metadatas=metadatas[i:i+BATCH_SIZE],
                 ids=ids[i:i+BATCH_SIZE]
             )
-        logger.info(f"✅ Successfully indexed {len(documents)} chunks.")
+        logger.info(f"✅ Indexed {len(documents)} total chunks ({len(chunks_data.get('micro', []))} micro, {len(chunks_data.get('macro', []))} macro).")
     except Exception as error:
         logger.error(f"❌ Error connecting to Chroma. Details: {error}")
         raise error

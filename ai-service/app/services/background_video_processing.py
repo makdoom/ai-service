@@ -1,10 +1,14 @@
 # from app.services.video import download_video
+import requests
+import logging
 from app.services.vector_db import store_in_chroma
 from app.services.transcribe import transcribe_audio
 from app.services.video import extract_audio
 from app.core.config import settings
 import os
 from app.schemas.payloads import IngestVideoRequest
+
+logger = logging.getLogger(__name__)
 
 
 def background_video_processing(request: IngestVideoRequest):
@@ -34,15 +38,15 @@ def background_video_processing(request: IngestVideoRequest):
   
   finally:
     # Cleanup
-    if os.path.exists(video_path):
-      os.remove(video_path)
-    if os.path.exists(audio_path):
-      os.remove(audio_path)
+    # if os.path.exists(video_path):
+    #   os.remove(video_path)
+    # if os.path.exists(audio_path):
+    #   os.remove(audio_path)
         
     # Call Webhook
     try:
       payload = {"video_id": request.video_id, "status": status}
-      # requests.post(request.webhook_url, json=payload)
+      requests.post(request.webhook_url, json=payload)
       print('Sending webhook to ', request.webhook_url)
     except Exception as e:
       logger.error(f"Failed to trigger webhook: {e}")

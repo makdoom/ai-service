@@ -21,30 +21,33 @@ export const initVideoWorker = () => {
 
       try {
         // 2. Call Python FastAPI service with webhook
-        // const response = await fetch(`${aiServiceUrl}/api/v1/ingest-video`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     video_id: videoId,
-        //     video_url: videoUrl,
-        //     webhook_url: `${process.env.BACKEND_URL}/api/v1/video/webhook`
-        //   }),
-        // });
+        const response = await fetch(`${aiServiceUrl}/api/v1/ingest-video`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Auth-Token": process.env.AUTH_TOKEN,
+          },
+          body: JSON.stringify({
+            video_id: videoId,
+            video_url: videoUrl,
+            webhook_url: `${process.env.BACKEND_URL}/api/v1/video/webhook`,
+          }),
+        });
 
-        // if (!response.ok) {
-        //   const errorData = await response.json().catch(() => ({}));
-        //   throw new Error(`AI Service returned ${response.status}: ${JSON.stringify(errorData)}`);
-        // }
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            `AI Service returned ${response.status}: ${JSON.stringify(errorData)}`,
+          );
+        }
 
-        // const result = await response.json();
+        const result = await response.json();
         console.log(
           `[worker]: Acknowledgement from AI Service for video ${videoId}:`,
         );
 
         // We don't emit "completed" yet. The AI Service will call our webhook instead.
-        // return result;
+        return result;
       } catch (error: any) {
         console.error(`[worker]: Error processing video ${videoId}:`, error);
 

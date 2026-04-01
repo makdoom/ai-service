@@ -14,9 +14,9 @@ def transcribe_audio(audio_path: str):
             text = segment.text.strip().replace("\n", " ")
             if not text or len(text) < 3: continue
             raw_segments.append(segment)
-            
-        from app.services.semantic_chunking import semantic_chunk_transcript
-        smart_chunks = semantic_chunk_transcript(raw_segments)
+        
+        from app.services.advanced_chunking import advanced_chunk_transcript
+        smart_chunks = advanced_chunk_transcript(raw_segments)
         return smart_chunks
     except Exception as e:
         logger.error(f"❌ Error transcribing audio: {e}")

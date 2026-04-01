@@ -6,19 +6,22 @@ from app.core.clients import get_genai_client, get_chroma_client
 
 logger = logging.getLogger(__name__)
 
+def to_timestamp(seconds: float) -> str:
+  mins = int(seconds // 60)
+  secs = int(seconds % 60)
+  return f"{mins}:{secs:02d}"
+
 async def query_rag(query: str, video_id: str):
   logger.info(f"\n🔍 Searching for: '{query}' in video {video_id}...")
   try:
     chroma_client = get_chroma_client()
     gemini_embedding_func = GeminiEmbeddingFunction()
     
-    # collection.get_collection is sync, wrapping in thread if needed (though it's fast)
     collection = await asyncio.to_thread(chroma_client.get_collection, name=video_id, embedding_function=gemini_embedding_func)
   except Exception as error:
     logger.error(f"❌ Collection not found for {video_id}. Details: {error}")
     return None, []
 
-  # collection.query is sync (I/O intensive), wrap in thread
   results = await asyncio.to_thread(collection.query, query_texts=[query], n_results=5)
   
   if not results["documents"] or not results["documents"][0]:
@@ -27,25 +30,57 @@ async def query_rag(query: str, video_id: str):
   
   context_blocks = []
   context_used = []
+  seen_context = set()
+  
   for i in range(len(results["documents"][0])):
-    text = results["documents"][0][i]
     meta = results["metadatas"][0][i]
-    timestamp = f"[{meta['start']:.2f}s - {meta['end']:.2f}s]"
+    chunk_type = meta.get("type", "micro")
     
-    context_used.append(f"{timestamp}: {text}")
-    context_blocks.append(f"[CHUNK {i+1}]\nTIMESTAMP: {timestamp}\nTEXT: {text}")
+    # Priority Context: If it's a micro chunk, the real context is its macro parent
+    if chunk_type == "micro":
+        context_text = meta.get("macro_parent", results["documents"][0][i])
+    else:
+        context_text = results["documents"][0][i]
+        
+    if context_text in seen_context:
+        continue
+    seen_context.add(context_text)
+    
+    start_ts = to_timestamp(meta['start'])
+    end_ts = to_timestamp(meta['end'])
+    display_ts = f"({start_ts}-{end_ts})"
+    
+    context_used.append(f"{display_ts}: {context_text[:100]}...") # Log summary
+    context_blocks.append(f"[CONTEXT BLOCK {len(context_blocks)+1}]\nSOURCE TIMESTAMP: {display_ts}\nTEXT: {context_text}")
 
   context_text = "\n\n".join(context_blocks)
 
+  print(context_text)
+  
   system_prompt = (
-    "You are an AI video assistant.\n"
-    "Answer ONLY using the provided context.\n"
-    "The context is a list of timestamped audio segments.\n"
-    "You MUST find the timestamp corresponding to the specific segment where your answer is found.\n"
-    "You MUST place this timestamp at the VERY END of your response.\n"
-    "Example Answer: 'The grass is green. [15.0s]'\n"
-    "If the answer is missing, say: 'I cannot find the answer in the video context.'\n"
-    "Be concise."
+    "You are an AI Video Assistant that answers questions based on a provided timestamped transcript.\n"
+    "Your goal is to provide accurate, helpful, and concise answers using ONLY the context provided.\n\n"
+
+    "Context Format:\n"
+    "- You will receive context blocks containing text prepended with internal markers like [XX.Xs] (decimal seconds).\n"
+    "- High-precision citations are required for all facts.\n\n"
+
+    "Instructions:\n"
+    "1. Citations:\n"
+    "- Every fact or claim MUST be immediately followed by a citation in (M:SS) format.\n"
+    "- Convert the decimal [XX.Xs] markers into standard (M:SS) format. (Example: [75.0s] becomes (1:15)).\n"
+    "- If a specific internal marker is available for a fact, always prefer it for pinpoint accuracy.\n\n"
+
+    "2. Synthesis & Context:\n"
+    "- Combine multiple relevant points into a coherent, organized response.\n"
+    "- Start with a clear and direct answer to the user's question.\n"
+    "- Use the surrounding context within the larger context blocks to provide better nuance and depth.\n\n"
+
+    "3. Constraints:\n"
+    "- Maintain a professional and objective tone suitable for any video content (tutorials, podcasts, news, etc.).\n"
+    "- If the answer is not explicitly found in the context, respond EXACTLY with: 'I cannot find the answer in the video context.'\n\n"
+
+    "Answer:"
   )
 
   genai_client = get_genai_client()
