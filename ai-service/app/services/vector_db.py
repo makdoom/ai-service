@@ -49,7 +49,6 @@ def store_in_chroma(chunks_data: dict, video_id: str):
             })
             ids.append(f"{video_id}_micro_{i}")
 
-        # Index Macro Chunks (Boundary/Themes layer)
         for i, chunk in enumerate(chunks_data.get("macro", [])):
             if not chunk["text"]: continue
             documents.append(chunk["text"])

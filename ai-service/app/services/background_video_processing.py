@@ -27,14 +27,24 @@ def background_video_processing(request: IngestVideoRequest):
     extract_audio(video_path, audio_path)
 
     # transcribe audio
-    chunks = transcribe_audio(audio_path)
+    chunks, full_text = transcribe_audio(audio_path)
 
     # store in chromadb
     store_in_chroma(chunks, request.video_id)
 
+    # generate summary and questions
+    from app.services.video_insights import generate_video_insights
+    import asyncio
+    
+    insights = asyncio.run(generate_video_insights(full_text))
+    summary = insights.get("summary", "")
+    start_questions = insights.get("start_questions", [])
+
   except Exception as e:
     logger.error(f"Background processing failed: {e}")
     status = "FAILED"
+    summary = ""
+    start_questions = []
   
   finally:
     # Cleanup
@@ -45,9 +55,14 @@ def background_video_processing(request: IngestVideoRequest):
         
     # Call Webhook
     try:
-      payload = {"video_id": request.video_id, "status": status}
+      payload = {
+          "video_id": request.video_id, 
+          "status": status,
+          "summary": summary,
+          "start_questions": start_questions
+      }
       requests.post(request.webhook_url, json=payload)
-      print('Sending webhook to ', request.webhook_url)
+      logger.info(f"✅ Webhook sent to {request.webhook_url} with insights.")
     except Exception as e:
       logger.error(f"Failed to trigger webhook: {e}")
 

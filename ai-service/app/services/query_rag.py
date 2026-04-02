@@ -54,9 +54,8 @@ async def query_rag(query: str, video_id: str):
     context_blocks.append(f"[CONTEXT BLOCK {len(context_blocks)+1}]\nSOURCE TIMESTAMP: {display_ts}\nTEXT: {context_text}")
 
   context_text = "\n\n".join(context_blocks)
+  logger.info(f"📚 Context retrieval complete. Found {len(context_blocks)} distinct context blocks.")
 
-  print(context_text)
-  
   system_prompt = (
     "You are an AI Video Assistant that answers questions based on a provided timestamped transcript.\n"
     "Your goal is to provide accurate, helpful, and concise answers using ONLY the context provided.\n\n"

@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     CHROMA_DB_PATH: str = "./chroma_db"
     
     # Gemini Models
-    GEMINI_MODEL: str = "gemini-2.5-flash" 
+    GEMINI_MODEL: str = "gemini-2.5-flash-lite" 
     EMBEDDING_MODEL: str = "gemini-embedding-001"
     
     # Security
