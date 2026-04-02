@@ -53,9 +53,12 @@ class VideoController {
 
   public handleWebhook = async (req: Request, res: Response) => {
     try {
+      console.log(req.body);
       const { video_id, status, result, error } = req.body || {};
 
-      console.log(`[webhook]: Received webhook for video ${video_id}: ${status}`);
+      console.log(
+        `[webhook]: Received webhook for video ${video_id}: ${status}`,
+      );
 
       if (!video_id) {
         return res.status(400).json({ error: "Missing video_id" });
@@ -71,7 +74,9 @@ class VideoController {
         error: error || (status === "failed" ? "Processing failed" : null),
       });
 
-      return res.status(200).json({ message: "Webhook processed successfully" });
+      return res
+        .status(200)
+        .json({ message: "Webhook processed successfully" });
     } catch (error: any) {
       console.error("[webhook]: Error handling webhook:", error);
       return res.status(500).json({ error: "Internal Server Error" });
