@@ -1,23 +1,14 @@
-import logging
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import os
-
-from app.core.config import settings
+from app.core.logging import setup_logging
+from app.api.v1.router import router
 from app.core.exceptions import configure_exception_handlers
-from app.api.v1.api_router import api_router
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
+from fastapi import FastAPI
 
-# Silence HuggingFace logic
-os.environ["TRANSFORMERS_VERBOSITY"] = "error"
-os.environ["HF_HUB_VERBOSITY"] = "error"
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+# Setup Logging
+setup_logging()
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
-
-def create_app() -> FastAPI:
+def create_app() -> FastAPI: 
     app = FastAPI(
         title=settings.PROJECT_NAME,
         version="1.0.0",
@@ -25,19 +16,23 @@ def create_app() -> FastAPI:
         docs_url=f"{settings.API_V1_STR}/docs",
     )
 
-    # Set up CORS defaults
+    # Set up CORS middleware
     app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        CORSMiddleware, 
+        allow_origins=settings.CORS_ORIGINS, 
+        allow_credentials=True, 
+        allow_methods=["*"], 
+        allow_headers=["*"]
     )
 
+
+
+    # Global Error Handler
     configure_exception_handlers(app)
 
     # Include the main API router
-    app.include_router(api_router, prefix=settings.API_V1_STR)
+    app.include_router(router, prefix=settings.API_V1_STR)
+
 
     return app
 
