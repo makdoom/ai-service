@@ -1,0 +1,559 @@
+1
+00:00:00,200 --> 00:00:04,560
+hoisting sounds like a big scary word and people like to throw it around to make themselves
+
+2
+00:00:04,560 --> 00:00:09,039
+seem smarter in like they know what they're talking about, but in reality hoisting is actually
+
+3
+00:00:09,039 --> 00:00:13,439
+a very simple concept in JavaScript and it's so simple I'm going to explain everything
+
+4
+00:00:13,439 --> 00:00:16,759
+you need to know about hoisting using less than 10 lines of code.
+
+5
+00:00:20,500 --> 00:00:24,800
+Welcome back to web dev simplified. My name is Kyle and my job is to simplify the web for you
+
+6
+00:00:24,800 --> 00:00:28,199
+so you can start building your dream project sooner. And today we're going to be talking about
+
+7
+00:00:28,199 --> 00:00:32,340
+hoisting. And this code right here is pretty much all I need to explain how hoisting works.
+
+8
+00:00:32,679 --> 00:00:37,399
+So we have two functions that do exactly the same thing. They just add the numbers A and B together.
+
+9
+00:00:37,719 --> 00:00:41,820
+The only difference is this first function is defined using the function keyword. So I've called
+
+10
+00:00:41,820 --> 00:00:43,859
+it some funk. And there's bottom function.
+
+11
+00:00:43,950 --> 00:00:45,650
+down here is defined using the const keyword,
+
+12
+00:00:45,830 --> 00:00:47,450
+so I just added const to the sum name.
+
+13
+00:00:47,990 --> 00:00:48,930
+And you can see they're printing out,
+
+14
+00:00:48,990 --> 00:00:50,790
+we're adding one and two, it gives us three,
+
+15
+00:00:51,130 --> 00:00:52,469
+adding three and four and it gives us seven,
+
+16
+00:00:52,670 --> 00:00:53,670
+they're working just fine.
+
+17
+00:00:54,210 --> 00:00:55,910
+And the reason this works is because in JavaScript,
+
+18
+00:00:55,950 --> 00:00:58,050
+all of your code runs from the top of the file,
+
+19
+00:00:58,230 --> 00:01:00,290
+all the way to the bottom of the file in order.
+
+20
+00:01:00,590 --> 00:01:01,930
+So we're defining this function,
+
+21
+00:01:02,130 --> 00:01:03,189
+we're defining this function,
+
+22
+00:01:03,370 --> 00:01:05,469
+and then we're running these two console log statements,
+
+23
+00:01:05,849 --> 00:01:07,109
+top to bottom just like that.
+
+24
+00:01:07,700 --> 00:01:09,480
+But if you've used JavaScript for a while,
+
+25
+00:01:09,579 --> 00:01:11,359
+you'll notice that you can actually take functions
+
+26
+00:01:11,900 --> 00:01:13,460
+and move them wherever you want in your code.
+
+27
+00:01:13,579 --> 00:01:15,340
+For example, our function is now at the very bottom.
+
+28
+00:01:15,780 --> 00:01:17,320
+And even though our function's at the bottom,
+
+29
+00:01:17,520 --> 00:01:18,500
+everything still works.
+
+30
+00:01:18,879 --> 00:01:20,640
+Which seems a little bit counterintuitive
+
+31
+00:01:20,640 --> 00:01:21,920
+because you would think, okay,
+
+32
+00:01:22,000 --> 00:01:23,120
+you run your code top to bottom,
+
+33
+00:01:23,240 --> 00:01:24,079
+we define this function.
+
+34
+00:01:24,500 --> 00:01:25,640
+Now we get to this line where we're trying
+
+35
+00:01:25,640 --> 00:01:27,040
+to call our sum function.
+
+36
+00:01:27,620 --> 00:01:29,719
+We haven't actually defined that function yet.
+
+37
+00:01:30,099 --> 00:01:31,980
+So why is it that we can actually move this function
+
+38
+00:01:31,980 --> 00:01:33,620
+to the bottom and everything still works?
+
+39
+00:01:34,299 --> 00:01:37,599
+It gets even more confusing because if we move this some function down to the bottom.
+
+40
+00:01:38,500 --> 00:01:40,040
+You're now going to notice we're going to get errors.
+
+41
+00:01:40,420 --> 00:01:41,939
+This first one still works just fine,
+
+42
+00:01:42,099 --> 00:01:43,799
+but this second one is no longer working.
+
+43
+00:01:43,879 --> 00:01:45,459
+It's saying, hey, we can't reference
+
+44
+00:01:45,459 --> 00:01:47,920
+this sum const function before we initialize it.
+
+45
+00:01:48,180 --> 00:01:50,719
+So sometimes this is working and sometimes it isn't,
+
+46
+00:01:50,879 --> 00:01:52,120
+the whole reason this is working
+
+47
+00:01:52,120 --> 00:01:53,420
+is because of hoisting.
+
+48
+00:01:53,719 --> 00:01:55,620
+But hoisting doesn't JavaScript is essentially
+
+49
+00:01:55,620 --> 00:01:57,420
+takes some of your code and it moves us
+
+50
+00:01:57,420 --> 00:02:00,099
+to the very top of your file automatically for you.
+
+51
+00:02:00,420 --> 00:02:01,859
+So what in our case is happening
+
+52
+00:02:01,859 --> 00:02:03,019
+is this function right here.
+
+53
+00:02:03,340 --> 00:02:05,579
+When we run our code before our actual code runs,
+
+54
+00:02:05,579 --> 00:02:06,819
+JavaScript automatically...
+
+55
+00:02:06,849 --> 00:02:10,069
+takes this function, and it moves us all the way to the very top of our file.
+
+56
+00:02:10,530 --> 00:02:14,150
+And it'll do this for every single function we have this defined with the function keyword.
+
+57
+00:02:14,469 --> 00:02:17,969
+So anytime you define a function, it's going to get moved as if it was at the top of your
+
+58
+00:02:17,969 --> 00:02:19,909
+file, and then your code is going to run.
+
+59
+00:02:20,389 --> 00:02:23,769
+So that means that if I have a function, for example, this sumfunk, and I have it defined
+
+60
+00:02:23,769 --> 00:02:28,169
+at the bottom of my file, everything is still going to work fine when I save because, before
+
+61
+00:02:28,169 --> 00:02:32,109
+the code runs JavaScript is essentially moving this function to the very top of my file
+
+62
+00:02:32,109 --> 00:02:34,990
+for me, which means it's going to be defined when I try to use it.
+
+63
+00:02:35,500 --> 00:02:38,300
+But this does not happen when you use the const keyword.
+
+64
+00:02:38,680 --> 00:02:40,960
+This only happens when you use the function keyword.
+
+65
+00:02:41,360 --> 00:02:42,719
+And that's where a lot of people get tripped up
+
+66
+00:02:42,719 --> 00:02:45,099
+when it comes to hoisting because only normal functions
+
+67
+00:02:45,099 --> 00:02:47,099
+are hoisted, while things like arrow functions
+
+68
+00:02:47,099 --> 00:02:49,819
+defined with const or lead, for example, are not hoisted.
+
+69
+00:02:50,099 --> 00:02:50,520
+Now, the reason-
+
+70
+00:02:50,550 --> 00:02:54,530
+Using 4 of this is because variables defined using const and let, which in our example
+
+71
+00:02:54,530 --> 00:02:57,570
+arrow functions, using const and let, those are not hoisted.
+
+72
+00:02:57,689 --> 00:03:00,850
+That's just built into how const and let work, they are never hoisted at all.
+
+73
+00:03:01,170 --> 00:03:04,310
+So if you want to define a function at the bottom of your file, using the normal function
+
+74
+00:03:04,310 --> 00:03:05,370
+keyword is the way to go.
+
+75
+00:03:05,900 --> 00:03:09,939
+right there covers like 99% of your use case when it comes to hoisting, but there's actually
+
+76
+00:03:09,939 --> 00:03:14,580
+one other thing in JavaScript that is hoisted that isn't a function, and that is the var keyword.
+
+77
+00:03:14,980 --> 00:03:18,759
+So you probably know const and let for defining variables, but you can also define variables
+
+78
+00:03:18,759 --> 00:03:22,879
+using the var keyword. And if we look over here at our error, it says reference error cannot access
+
+79
+00:03:22,879 --> 00:03:24,020
+this function before it...
+
+80
+00:03:24,710 --> 00:03:27,170
+But I changed this to say var, we're going to get a different error.
+
+81
+00:03:27,469 --> 00:03:30,890
+Instead it's going to say uncott type arrow, some const is not a function.
+
+82
+00:03:31,390 --> 00:03:33,969
+And that's because the var keyword actually is hoisted as well.
+
+83
+00:03:34,390 --> 00:03:36,710
+And the way that it works is a little bit different than how functions work.
+
+84
+00:03:36,870 --> 00:03:38,570
+So we'll be just change this here to say 2.
+
+85
+00:03:38,990 --> 00:03:40,790
+We're just going to call this a variable we'll call it var.
+
+86
+00:03:41,150 --> 00:03:41,970
+Actually we'll call it a.
+
+87
+00:03:42,699 --> 00:03:45,179
+I will get rid of all the rest of this code, and we'll just have...
+
+88
+00:03:45,500 --> 00:03:45,780
+und so.
+
+89
+00:03:46,699 --> 00:03:47,539
+dot log a.
+
+90
+00:03:48,099 --> 00:03:48,840
+So right now this is working,
+
+91
+00:03:48,939 --> 00:03:50,139
+we're logging out the variable two.
+
+92
+00:03:50,560 --> 00:03:52,479
+What happens if we move this console log above
+
+93
+00:03:52,479 --> 00:03:53,359
+where we define a?
+
+94
+00:03:53,680 --> 00:03:55,739
+Well, if this was defined using a const or let variable,
+
+95
+00:03:55,879 --> 00:03:57,299
+we're gonna get an error because it's like hey,
+
+96
+00:03:57,740 --> 00:03:59,379
+a is not defined yet because we're trying to use it
+
+97
+00:03:59,379 --> 00:04:00,199
+before we define it.
+
+98
+00:04:00,579 --> 00:04:01,859
+Well, the var we're not gonna get an error.
+
+99
+00:04:02,120 --> 00:04:03,379
+It's gonna print out undefined.
+
+100
+00:04:03,740 --> 00:04:06,219
+That's because anytime you create a variable using var,
+
+101
+00:04:06,699 --> 00:04:07,959
+essentially what JavaScript does
+
+102
+00:04:07,959 --> 00:04:09,259
+is at the very top of your file,
+
+103
+00:04:09,400 --> 00:04:11,680
+it creates an initialization that looks like this.
+
+104
+00:04:13,099 --> 00:04:14,519
+And then wherever your variable is defined,
+
+105
+00:04:14,719 --> 00:04:16,060
+it essentially is just setting that variable.
+
+106
+00:04:16,300 --> 00:04:17,779
+So essentially your code gets converted
+
+107
+00:04:17,779 --> 00:04:18,639
+to something like this.
+
+108
+00:04:18,959 --> 00:04:20,980
+And when you run it, you see we get the exact same result.
+
+109
+00:04:21,259 --> 00:04:22,300
+So every time you use var,
+
+110
+00:04:22,459 --> 00:04:24,300
+it's going to hoist the initialization
+
+111
+00:04:24,300 --> 00:04:25,939
+of that variable to the top of your file,
+
+112
+00:04:25,959 --> 00:04:27,879
+but it's just going to be initialized to undefined
+
+113
+00:04:27,879 --> 00:04:30,300
+until you actually initialize that in your code.
+
+114
+00:04:30,899 --> 00:04:34,739
+Now luckily for you this is really not something you have to worry about because VAR is something
+
+115
+00:04:34,739 --> 00:04:36,500
+you probably should never use in programming.
+
+116
+00:04:36,739 --> 00:04:40,939
+You should always use LED or cons because they are just better ways of defining variables
+
+117
+00:04:40,939 --> 00:04:44,259
+and they get rid of a lot of the problems such as hoisting that you really don't want
+
+118
+00:04:44,259 --> 00:04:46,000
+to deal with with variables that you use VAR.
+
+119
+00:04:46,100 --> 00:04:50,580
+The only time you're ever going to see a variable is in like really tricky interview questions
+
+120
+00:04:50,580 --> 00:04:54,120
+where they're going to write out code that looks just like this, and they're going to ask
+
+121
+00:04:54,120 --> 00:04:55,640
+you what is the output of this code.
+
+122
+00:04:55,900 --> 00:04:58,580
+Most people would say it's going to throw an error, but technically now that you've
+
+123
+00:04:58,580 --> 00:05:01,100
+seen this video, you know it's going to output undefined.
+
+124
+00:05:02,000 --> 00:05:03,839
+10 lines of code and five minutes later,
+
+125
+00:05:03,980 --> 00:05:05,860
+and now you understand everything you need to know
+
+126
+00:05:05,860 --> 00:05:07,500
+about hoisting, but this is only one
+
+127
+00:05:07,500 --> 00:05:09,620
+of many JavaScript concepts out there.
+
+128
+00:05:10,000 --> 00:05:12,220
+If you want to understand all these JavaScript concepts
+
+129
+00:05:12,220 --> 00:05:14,740
+using this easy to understand simplified format,
+
+130
+00:05:15,019 --> 00:05:17,139
+you're going to love my JavaScript simplified course.
+
+131
+00:05:17,480 --> 00:05:19,740
+It breaks down every important JavaScript concept
+
+132
+00:05:19,740 --> 00:05:20,620
+and it's easy to understand.
+
+133
+00:05:20,649 --> 00:05:23,969
+understand video, also has tons of different projects and walkthroughs for you to really
+
+134
+00:05:23,969 --> 00:05:24,789
+test your skills.
+
+135
+00:05:25,209 --> 00:05:28,109
+And best of all, it doesn't matter what skill level you are, you can take this course
+
+136
+00:05:28,109 --> 00:05:31,509
+and learn a ton, and it's going to take you all the way to an advanced developer by the
+
+137
+00:05:31,509 --> 00:05:32,409
+time you're done with this course.
+
+138
+00:05:32,870 --> 00:05:35,129
+So if you're interested, it's going to be linked down in the description below.
+
+139
+00:05:35,310 --> 00:05:36,529
+I highly recommend you check it out.
+
+140
+00:05:36,870 --> 00:05:39,169
+With that said, thank you very much for watching and have a good day.
